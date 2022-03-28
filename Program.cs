@@ -32,7 +32,6 @@ void ShowTop10OldFiles(DirStatistics stat)
 void ShowTop10Extensions(DirStatistics stat)
 {
     var data = stat.ExtensionAndFrequencyInfo();
-    data.Sort();
     var table = new ConsoleTable("Extension", "Frequency");
     for (int i = 0; i < data.Count && i < 10; i++)
     {

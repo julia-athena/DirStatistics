@@ -38,21 +38,28 @@ namespace DirStat
         public List<KeyValuePair<string, int>> ExtensionAndFrequencyInfo()
         {
             var paths = Directory.GetFiles(DirPath);
-            var extensionInfos = new Dictionary<string, int>();
+            var extFrequency = new Dictionary<string, int>();
             foreach (var path in paths)
             {
                 var currExt = Path.GetExtension(path);
-                if (!extensionInfos.ContainsKey(currExt))
-                {
-                    extensionInfos.Add(currExt, 1);
-                }
+                if (!extFrequency.ContainsKey(currExt))
+                    extFrequency.Add(currExt, 1);
                 else
-                {
-                    extensionInfos[currExt] = extensionInfos[currExt] + 1;
-                }
+                    extFrequency[currExt] = extFrequency[currExt] + 1;
             }
-            var res = extensionInfos.ToList();
-            return res;
+            var sortedList = extFrequency.ToList();
+            sortedList.Sort(CompareByValueDesc);  
+            return sortedList;
+        }
+
+        private int CompareByValueDesc(KeyValuePair<string, int> x, KeyValuePair<string, int> y)
+        {
+            if (x.Value < y.Value)
+                return 1;
+            else if (x.Value == y.Value)
+                return 0;
+            else
+                return -1;
         }
     }
 }
