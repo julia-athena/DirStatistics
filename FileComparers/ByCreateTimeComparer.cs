@@ -4,9 +4,9 @@ using System.Collections;
 
 namespace DirStat.FileComparers
 {
-    internal class ByCreateTimeComparer: IComparer<FileInfo>
+    internal class ByCreateTimeComparer: IComparer<StatItem>
     {
-        public int Compare(FileInfo? x, FileInfo? y)
+        public int Compare(StatItem? x, StatItem? y)
         {
             if (x.CreationTime > y.CreationTime)
                 return 1;

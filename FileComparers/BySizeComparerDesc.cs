@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace DirStat.FileComparers
 {
-    internal class BySizeComparerDesc : IComparer<FileInfo>
+    internal class BySizeComparerDesc : IComparer<StatItem>
     {
-        public int Compare(FileInfo? x, FileInfo? y)
+        public int Compare(StatItem? x, StatItem? y)
         {
-            if (x.Length < y.Length)
+            if (x.Size < y.Size)
                 return 1;
-            else if (x.Length == y.Length)
+            else if (x.Size == y.Size)
                 return 0;
             else 
                 return -1;
