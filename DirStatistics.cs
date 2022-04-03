@@ -9,14 +9,19 @@ namespace DirStat
         private DirectoryInfo DirInfo;
         private List<string> DirFiles;
         private List<StatItem> StatItems;
-        private string StatFilePath;
-        public DirStatistics(string path)
+        private string WorkPath = "";
+        private string FileName = "";
+        public DirStatistics(string dirPath, string workPath): this(dirPath)
         {
-            DirInfo = new DirectoryInfo(path);
+            WorkPath = workPath;
+        }
+        public DirStatistics(string dirPath)
+        {
+            DirInfo = new DirectoryInfo(dirPath);
             StatItems = new List<StatItem>();
-            DirFiles = new List<string>(); 
-            StatFilePath = "";
-        } 
+            DirFiles = new List<string>();
+        }
+
 
         public List<StatItem> GetTopNFiles(int n, IComparer<StatItem> comparer)
         {
@@ -25,8 +30,8 @@ namespace DirStat
             if (StatItems.Count == 0)
                 FreshStatistics();
             if (StatItems.Count > 0)
-                StatItems.Sort(comparer); // TODO постоянно будет сортироваться, как сохранить результат сортировки 
-            return StatItems;
+                StatItems.Sort(comparer);
+            return StatItems.GetRange(1,n);
         }
         public void FreshStatistics()
         {
@@ -43,12 +48,26 @@ namespace DirStat
 
         private void GetStatItemsFromFile()
         {
-
+            using (StreamReader reader = new StreamReader(FileName))
+            {
+                string? line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    StatItems.Add(new StatItem(line));
+                }
+            }
         }
 
         private void WriteStatItemsToFile()
         {
-
+            StatItems.Sort();
+            using (StreamWriter writer = new StreamWriter(FileName, false))
+            {
+                foreach (var item in StatItems)
+                {
+                    writer.WriteLine(item.ToString());
+                }
+            }
         }
 
         private void WalkDir()
