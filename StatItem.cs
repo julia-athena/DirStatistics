@@ -11,7 +11,7 @@ namespace DirStat
         public string FullName;
         public long Size;
         public DateTime CreationTime;
-        public readonly DateTime RegTime;
+        public readonly DateTime RegTime = DateTime.Now;
 
         public StatItem(string input)
         {
@@ -38,7 +38,7 @@ namespace DirStat
         }
         private static string ParseValue(string key, string input)
         {
-            string pattern = $@"{key}:\w*";
+            string pattern = $@"{key}:[^,]*";
             var match = Regex.Match(input, pattern).Value;
             var value = match.Replace($"{key}:","");
             return value;

@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace DirStat.FileComparers
 {
-    internal class ByCreateTimeComparer: IComparer<StatItem>
+    public class ByCreateTimeComparer: IComparer<StatItem>
     {
         public int Compare(StatItem? x, StatItem? y)
         {

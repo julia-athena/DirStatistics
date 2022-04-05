@@ -4,34 +4,29 @@ using DirStat.FileComparers;
 
 namespace DirStat
 {
-    internal class DirStatistics
+    public class DirStatistics
     {
         private DirectoryInfo DirInfo;
         private List<string> DirFiles;
         private List<StatItem> StatItems;
-        private string WorkPath = "";
-        private string FileName = "";
-        public DirStatistics(string dirPath, string workPath): this(dirPath)
-        {
-            WorkPath = workPath;
-        }
+        private string StatFileName = "DirStat.stat";
+
         public DirStatistics(string dirPath)
         {
             DirInfo = new DirectoryInfo(dirPath);
             StatItems = new List<StatItem>();
             DirFiles = new List<string>();
+            StatFileName = Path.Combine(dirPath, StatFileName);
         }
-
-
         public List<StatItem> GetTopNFiles(int n, IComparer<StatItem> comparer)
         {
             if (StatItems.Count == 0)
-                GetStatItemsFromFile();
+                ReadStatItemsFromFile();
             if (StatItems.Count == 0)
                 FreshStatistics();
             if (StatItems.Count > 0)
                 StatItems.Sort(comparer);
-            return StatItems.GetRange(1,n);
+            return StatItems.GetRange(0,n);
         }
         public void FreshStatistics()
         {
@@ -41,27 +36,40 @@ namespace DirStat
             foreach (var fileName in DirFiles)
             {
                 var file = new FileInfo(fileName);  
-                StatItems.Add(new StatItem { CreationTime = file.CreationTime, FullName = file.FullName, Size = file.Length});
+                StatItems.Add(new StatItem { 
+                    CreationTime = file.CreationTime, 
+                    FullName = file.FullName, 
+                    Size = file.Length
+                });
             }
             WriteStatItemsToFile();
         }
 
-        private void GetStatItemsFromFile()
+        private void ReadStatItemsFromFile()
         {
-            using (StreamReader reader = new StreamReader(FileName))
+
+            try
             {
-                string? line;
-                while ((line = reader.ReadLine()) != null)
+                using (StreamReader reader = new StreamReader(StatFileName))
                 {
-                    StatItems.Add(new StatItem(line));
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        StatItems.Add(new StatItem(line));
+                    }
                 }
+            }
+            catch (FileNotFoundException e)
+            {
+
+                Console.WriteLine($"StatFile does not exist");
             }
         }
 
         private void WriteStatItemsToFile()
         {
             StatItems.Sort();
-            using (StreamWriter writer = new StreamWriter(FileName, false))
+            using (StreamWriter writer = new StreamWriter(StatFileName, false))
             {
                 foreach (var item in StatItems)
                 {

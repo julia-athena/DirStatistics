@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DirStat.FileComparers
 {
-    internal class BySizeComparerDesc : IComparer<StatItem>
+    public class BySizeComparerDesc : IComparer<StatItem>
     {
-        public int Compare(StatItem? x, StatItem? y)
+        public int Compare(StatItem x, StatItem y)
         {
             if (x.Size < y.Size)
                 return 1;
