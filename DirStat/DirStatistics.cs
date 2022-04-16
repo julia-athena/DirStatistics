@@ -9,7 +9,7 @@ namespace DirStat
         private DirectoryInfo DirInfo;
         private List<string> DirFiles;
         private List<StatItem> StatItems;
-        private string StatFileName = "DirStat.stat";
+        private readonly string StatFileName = "DirStat.stat";
 
         public DirStatistics(string dirPath)
         {
@@ -26,7 +26,7 @@ namespace DirStat
                 FreshStatistics();
             if (StatItems.Count > 0)
                 StatItems.Sort(comparer);
-            return StatItems.GetRange(0,n);
+            return StatItems.GetRange(0, Math.Min(n, StatItems.Count));
         }
         public void FreshStatistics()
         {
@@ -55,14 +55,14 @@ namespace DirStat
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        StatItems.Add(new StatItem(line));
+                        StatItems.Add(StatItem.GetInstanceFromStr(line));
                     }
                 }
             }
             catch (FileNotFoundException e)
             {
 
-                Console.WriteLine($"StatFile does not exist");
+                Console.WriteLine("StatFile does not exist");
             }
         }
 
@@ -105,7 +105,7 @@ namespace DirStat
             }
             catch
             {
-                return new string[0];
+                return Array.Empty<string>();
             }
         }
         private string[] GetFiles(string dir)
@@ -116,7 +116,7 @@ namespace DirStat
             }
             catch
             {
-                return new string[0];
+                return Array.Empty<string>();
             }
         }
     }
