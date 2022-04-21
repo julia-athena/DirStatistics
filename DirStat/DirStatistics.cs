@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using DirStat.FileComparers;
 
 
@@ -7,8 +10,8 @@ namespace DirStat
     public class DirStatistics
     {
         private DirectoryInfo DirInfo;
-        private List<string> DirFiles;
-        private List<StatItem> StatItems;
+        public List<string> DirFiles;
+        public List<StatItem> StatItems;
         private readonly string StatFileName = "DirStat.stat";
 
         public DirStatistics(string dirPath)
@@ -18,7 +21,7 @@ namespace DirStat
             DirFiles = new List<string>();
             StatFileName = Path.Combine(dirPath, StatFileName);
         }
-        public List<StatItem> GetTopNFiles(int n, IComparer<StatItem> comparer)
+        public List<StatItem> GetTopNStatItems(int n, IComparer<StatItem> comparer)
         {
             if (StatItems.Count == 0)
                 ReadStatItemsFromFile();
@@ -28,6 +31,18 @@ namespace DirStat
                 StatItems.Sort(comparer);
             return StatItems.GetRange(0, Math.Min(n, StatItems.Count));
         }
+
+        public List<StatItem> GetStatItems(IComparer<StatItem> comparer)
+        {
+            if (StatItems.Count == 0)
+                ReadStatItemsFromFile();
+            if (StatItems.Count == 0)
+                FreshStatistics();
+            if (StatItems.Count > 0)
+                StatItems.Sort(comparer);
+            return StatItems;
+        }
+
         public void FreshStatistics()
         {
             DirFiles.Clear();
@@ -62,7 +77,7 @@ namespace DirStat
             catch (FileNotFoundException e)
             {
 
-                Console.WriteLine("StatFile does not exist");
+                Console.WriteLine($"Error: {e.Message}");
             }
         }
 

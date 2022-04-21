@@ -13,11 +13,6 @@ namespace DirStat
         public DateTime CreationTime;
         public DateTime RegTime = DateTime.Now;
 
-        public static StatItem GetInstanceFromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<StatItem>(json);
-        }
-
         public static StatItem GetInstanceFromStr(string input)
         {
             var fields = input.Split(',');
@@ -33,16 +28,12 @@ namespace DirStat
         {
         }
 
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
         public override string ToString()
         {
             return $"{FullName},{Size},{CreationTime},{RegTime}";
         }
 
-        public int CompareTo(StatItem? other)
+        public int CompareTo(StatItem other)
         {
             if (other == null)
                 return -1;
