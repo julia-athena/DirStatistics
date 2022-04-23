@@ -1,17 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DirStat;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace WebDirStat.Controllers
 {
     [ApiController] //Контроллеры веб-API обычно используют атрибут зачем?
-    [Route("api/statistics")] 
+    [Route("api/[controller]")]
     public class StatisticsController : ControllerBase // обязательно ли наследовать класc, в чем отличие от класса Controller
     {
-        [HttpPost] 
-        public IEnumerable<string> Statistics([FromBody] int dirName)
+        [HttpPost("data")] 
+        public IEnumerable<StatItem> ListStatItems([FromBody] string name) //почему не работает с атрибутом [FromBody] - 415 ошибка
         {
-            return Array.Empty<string>();
+            var stat = new DirStatistics(name);
+            var res = stat.GetStatItems(null);
+            return res; 
+        }
+        [HttpPost("ratings")]
+        public IEnumerable<StatItem> ListAndSortStatItems([FromForm] string name) //почему null 
+        {
+            var stat = new DirStatistics(name);
+            var res = stat.GetStatItems(null);
+            return res;
+        }
+        [HttpPost("mirror")]
+        public async Task<string>  MirrorTextFromBody() //есть ли более простой способ получить "просто текст" из тела?
+        {
+            using var reader = new StreamReader(Request.Body);
+            return await reader.ReadToEndAsync();
         }
     }
 }

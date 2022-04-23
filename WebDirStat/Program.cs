@@ -1,14 +1,21 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 //построитель приложения
 //за что отвечает: добавление конфигурации, добавление сервисов, настройка журналирования, общая конфигурация IHostBuilder и IWebHostBuilder
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+builder.Services.AddControllers(); // добавляет  необходимые сервисы для контроллеров API
+
 //Создаем экземпляр WebApplication - используется для управления обработкой запроса (настройки конвейера) и маршрутов
 //Реализует интерфейсы: IHost - запуск, остановка хоста, IApplicationBuilder - построение конвейера, IEndpointRouteBuilder - добавление конечных точек
 var app = builder.Build();
-//запуск приложения
+
+app.MapControllers(); //настраивает действия контроллера API как конечные точки.
+
 app.Run();
 //есть 3 подхода для настройки приложения:
 //WebHost.CreateDefaultBuilder() начиная с ASP.NET Core 2.x
