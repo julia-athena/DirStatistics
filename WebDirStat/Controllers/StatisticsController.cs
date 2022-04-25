@@ -19,8 +19,15 @@ namespace WebDirStat.Controllers
             var res = stat.GetStatItems(null);
             return res; 
         }
-        [HttpPost("ratings")]
-        public IEnumerable<StatItem> ListAndSortStatItems([FromForm] string name) //почему null 
+        [HttpPost("test/ratings")]
+        public IEnumerable<StatItem> ListAndSortStatItems([FromForm] string name) // null 
+        {
+            var stat = new DirStatistics(name);
+            var res = stat.GetStatItems(null);
+            return res;
+        }
+        [HttpPost("test/ratings1")]
+        public IEnumerable<StatItem> ListAndSortStatItems1(string name) // null 
         {
             var stat = new DirStatistics(name);
             var res = stat.GetStatItems(null);

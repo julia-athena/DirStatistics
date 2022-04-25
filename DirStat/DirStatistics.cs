@@ -10,7 +10,6 @@ namespace DirStat
     public class DirStatistics
     {
         private DirectoryInfo DirInfo;
-        public List<string> DirFiles;
         public List<StatItem> StatItems;
         private readonly string StatFileName = "DirStat.stat";
 
@@ -18,7 +17,6 @@ namespace DirStat
         {
             DirInfo = new DirectoryInfo(dirPath);
             StatItems = new List<StatItem>();
-            DirFiles = new List<string>();
             StatFileName = Path.Combine(dirPath, StatFileName);
         }
         public List<StatItem> GetTopNStatItems(int n, IComparer<StatItem> comparer)
@@ -45,10 +43,9 @@ namespace DirStat
 
         public void FreshStatistics()
         {
-            DirFiles.Clear();
             StatItems.Clear();  
-            WalkDir();
-            foreach (var fileName in DirFiles)
+            var files = GetFiles();
+            foreach (var fileName in files)
             {
                 var file = new FileInfo(fileName);  
                 StatItems.Add(new StatItem { 
@@ -65,7 +62,7 @@ namespace DirStat
 
             try
             {
-                using (StreamReader reader = new StreamReader(StatFileName))
+                using (var reader = new StreamReader(StatFileName))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
@@ -84,7 +81,7 @@ namespace DirStat
         private void WriteStatItemsToFile()
         {
             StatItems.Sort();
-            using (StreamWriter writer = new StreamWriter(StatFileName, false))
+            using (var writer = new StreamWriter(StatFileName, false))
             {
                 foreach (var item in StatItems)
                 {
@@ -93,46 +90,9 @@ namespace DirStat
             }
         }
 
-        private void WalkDir()
+        private IEnumerable<string> GetFiles()
         {
-            var stack = new Stack<string>();
-            stack.Push(DirInfo.FullName);
-            while(stack.Count > 0)
-            {
-                var currDir = stack.Pop();
-                var subDirs = GetSubDirs(currDir); 
-                foreach(var subDir in subDirs)
-                {
-                    stack.Push(subDir);
-                }
-                var currFiles = GetFiles(currDir);    
-                foreach(var currFile in currFiles)
-                {
-                    DirFiles.Add(currFile);
-                }
-            }
-        }
-        private string[] GetSubDirs(string dir)
-        {
-            try
-            {
-                return Directory.GetDirectories(dir);
-            }
-            catch
-            {
-                return Array.Empty<string>();
-            }
-        }
-        private string[] GetFiles(string dir)
-        {
-            try
-            {
-                return Directory.GetFiles(dir);
-            }
-            catch
-            {
-                return Array.Empty<string>();
-            }
+            return DirWalker.GetFilesRec(DirInfo.FullName);
         }
     }
 }
