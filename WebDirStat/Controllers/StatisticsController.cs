@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WebDirStat.Controllers
 {
-    [ApiController] //Контроллеры веб-API обычно используют атрибут зачем?
+    [ApiController] //Контроллер веб-API 
     [Route("api/[controller]")]
     public class StatisticsController : ControllerBase // обязательно ли наследовать класc, в чем отличие от класса Controller
     {

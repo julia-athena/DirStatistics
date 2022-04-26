@@ -11,13 +11,13 @@ namespace DirStat
     {
         private DirectoryInfo DirInfo;
         public List<StatItem> StatItems;
-        private readonly string StatFileName = "DirStat.stat";
+        private readonly string DbFile = "DirStat.txt";
 
         public DirStatistics(string dirPath)
         {
             DirInfo = new DirectoryInfo(dirPath);
             StatItems = new List<StatItem>();
-            StatFileName = Path.Combine(dirPath, StatFileName);
+            DbFile = Path.Combine(dirPath, DbFile);
         }
         public List<StatItem> GetTopNStatItems(int n, IComparer<StatItem> comparer)
         {
@@ -59,13 +59,15 @@ namespace DirStat
 
         private void ReadStatItemsFromFile()
         {
-
             try
             {
-                using (var reader = new StreamReader(StatFileName))
+                var dbFile = FindDbFileOrNull();
+                if (dbFile == null) return;
+                using var reader = new StreamReader(dbFile);
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
+                    if (line.StartsWith(DirInfo.FullName))
                     {
                         StatItems.Add(StatItem.GetInstanceFromStr(line));
                     }
@@ -73,21 +75,40 @@ namespace DirStat
             }
             catch (FileNotFoundException e)
             {
-
                 Console.WriteLine($"Error: {e.Message}");
             }
         }
-
         private void WriteStatItemsToFile()
         {
             StatItems.Sort();
-            using (var writer = new StreamWriter(StatFileName, false))
+            using var writer = new StreamWriter(DbFile, false);
+            foreach (var item in StatItems)
             {
-                foreach (var item in StatItems)
+                writer.WriteLine(item.ToString());
+            }
+        }
+        private string FindDbFileOrNull()
+        {
+            var dir = DirInfo;
+            string res = default;
+            while (dir != DirInfo.Root)
+            {
+                try
                 {
-                    writer.WriteLine(item.ToString());
+                    var files = dir.GetFiles("DirStat.txt");
+                    if (files != null)
+                    {
+                        res = files[0].FullName;
+                        break;
+                    }
+                    dir = DirInfo.Parent;
+                }
+                catch (System.Security.SecurityException e)
+                {
+                    Console.WriteLine($"Error: {e.Message}");
                 }
             }
+            return res;
         }
 
         private IEnumerable<string> GetFiles()
