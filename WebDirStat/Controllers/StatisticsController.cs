@@ -1,9 +1,9 @@
 ﻿using DirStat;
+using DirStat.FileComparers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using WebDirStat.Models;
 
@@ -16,21 +16,29 @@ namespace WebDirStat.Controllers
         [HttpPost("items")] 
         public IEnumerable<StatItem> ListStatItems([FromBody] StatOptions options)
         {
-            var stat = new DirStatistics(options.Name);
-            var res = stat.GetStatItems(null);
-            return res;
+            var stat = new DirStatistics(options.Dir);
+            var res = new List<StatItem>(); 
+            if (options.Sort == "CreationDate")
+            {
+               res = stat.GetTopNStatItems(options.Top ?? 5, new ByCreateTimeComparer());
+            }
+            else if (options.Sort == "Size")
+            {
+               res = stat.GetTopNStatItems(options.Top ?? 5, new ByCreateTimeComparer());
+            }
+            return res; 
         }
 
         [HttpPost("extensions")]
-        public IEnumerable<StatItem> ListExtensions([FromBody] StatOptions options)
+        public IEnumerable<string> ListExtensions([FromBody] StatOptions options)
         {
-            var stat = new DirStatistics(options.Name);
-            var res = stat.GetStatItems(null);
+            var stat = new DirStatistics(options.Dir);
+            var res = stat.GetTopNExtensions(options.Top ?? 5);
             return res;
         }
 
         [HttpPost("/test/ratings")]
-        public IEnumerable<StatItem> ListAndSortStatItemsTest([FromForm] string name) // null, [FromBody] - 415 ошибка при передаче текста 
+        public IEnumerable<StatItem> ListAndSortStatItemsTest([FromForm] string name) // null, [FromBody] - 415 ошибка при передаче текста в теле
         {
             var stat = new DirStatistics(name);
             var res = stat.GetStatItems(null);
@@ -41,6 +49,6 @@ namespace WebDirStat.Controllers
         {
             using var reader = new StreamReader(Request.Body);
             return await reader.ReadToEndAsync();
-        }
+        }  
     }
 }

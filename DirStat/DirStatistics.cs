@@ -13,11 +13,11 @@ namespace DirStat
         public List<StatItem> StatItems;
         private readonly string DbFile = "DirStat.txt";
 
-        public DirStatistics(string dirPath)
+        public DirStatistics(string path)
         {
-            DirInfo = new DirectoryInfo(dirPath);
+            DirInfo = new DirectoryInfo(path);
             StatItems = new List<StatItem>();
-            DbFile = Path.Combine(dirPath, DbFile);
+            DbFile = Path.Combine(path, DbFile);
         }
         public List<StatItem> GetTopNStatItems(int n, IComparer<StatItem> comparer)
         {
@@ -28,6 +28,10 @@ namespace DirStat
             if (StatItems.Count > 0)
                 StatItems.Sort(comparer);
             return StatItems.GetRange(0, Math.Min(n, StatItems.Count));
+        }
+        public List<string> GetTopNExtensions(int n)
+        {
+            throw new NotImplementedException();    
         }
 
         public List<StatItem> GetStatItems(IComparer<StatItem> comparer)
