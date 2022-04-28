@@ -31,7 +31,7 @@ namespace DirStat
             return dirFiles;    
         }
 
-        public static string[] GetSubDirs(string dir)
+        private static string[] GetSubDirs(string dir)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace DirStat
                 return Array.Empty<string>();
             }
         }
-        public static string[] GetFiles(string dir)
+        private static string[] GetFiles(string dir)
         {
             try
             {

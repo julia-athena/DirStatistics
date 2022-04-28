@@ -47,12 +47,8 @@ namespace DirStat
             var files = GetFiles();
             foreach (var fileName in files)
             {
-                var file = new FileInfo(fileName);  
-                StatItems.Add(new StatItem { 
-                    CreationTime = file.CreationTime, 
-                    FullName = file.FullName, 
-                    Size = file.Length
-                });
+                var file = new FileInfo(fileName);
+                StatItems.Add(new StatItem(file));
             }
             WriteStatItemsToFile();
         }
@@ -69,7 +65,7 @@ namespace DirStat
                 {
                     if (line.StartsWith(DirInfo.FullName))
                     {
-                        StatItems.Add(StatItem.GetInstanceFromStr(line));
+                        StatItems.Add(new StatItem(line));
                     }
                 }
             }
