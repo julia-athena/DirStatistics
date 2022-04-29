@@ -4,6 +4,6 @@
     {
         public string Dir { get; set; }
         public string Sort { get; set; }
-        public int? Top { get; set; }
+        public int Top { get; set; }
     }
 }

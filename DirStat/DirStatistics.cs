@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using DirStat.FileComparers;
+using System.Linq;
 
 
 namespace DirStat
@@ -10,7 +10,7 @@ namespace DirStat
     public class DirStatistics
     {
         private DirectoryInfo DirInfo;
-        public List<StatItem> StatItems;
+        private List<StatItem> StatItems;
         private readonly string DbFile = "DirStat.txt";
 
         public DirStatistics(string path)
@@ -19,32 +19,18 @@ namespace DirStat
             StatItems = new List<StatItem>();
             DbFile = Path.Combine(path, DbFile);
         }
-        public List<StatItem> GetTopNStatItems(int n, IComparer<StatItem> comparer)
+        public List<StatItem> GetStatItems()
         {
             if (StatItems.Count == 0)
                 ReadStatItemsFromFile();
             if (StatItems.Count == 0)
                 FreshStatistics();
-            if (StatItems.Count > 0)
-                StatItems.Sort(comparer);
-            return StatItems.GetRange(0, Math.Min(n, StatItems.Count));
+            return StatItems;
         }
-        public List<string> GetTopNExtensions(int n)
+        public List<string> GetExtensions()
         {
             throw new NotImplementedException();    
         }
-
-        public List<StatItem> GetStatItems(IComparer<StatItem> comparer)
-        {
-            if (StatItems.Count == 0)
-                ReadStatItemsFromFile();
-            if (StatItems.Count == 0)
-                FreshStatistics();
-            if (StatItems.Count > 0)
-                StatItems.Sort(comparer);
-            return StatItems;
-        }
-
         public void FreshStatistics()
         {
             StatItems.Clear();  
@@ -73,9 +59,9 @@ namespace DirStat
                     }
                 }
             }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
-                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine($"Error reading DbFile: {e.Message}");
             }
         }
         private void WriteStatItemsToFile()
