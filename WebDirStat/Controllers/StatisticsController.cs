@@ -17,16 +17,16 @@ namespace WebDirStat.Controllers
         [HttpPost("items")]
         public string ListStatItems([FromBody] StatOptions options)
         {
+            var res = new List<FileStatItem>();
             var items = new DirStatistics(options.Dir).GetStatItems();
-            var res = new List<StatItem>();
             //todo где должна быть логика внизу
-            if (options.Sort == "+CreationTime" || options.Sort == "CreationTime")
+            if (options.Sort == "+creationTime" || options.Sort == "creationTime")
                 res = items.OrderBy(x => x.CreationTime).ToList();
-            else if (options.Sort == "-CreationTime")
+            else if (options.Sort == "-creationTime")
                 res = items.OrderByDescending(x => x.CreationTime).ToList();
-            else if (options.Sort == "+Size" || options.Sort == "Size")
+            else if (options.Sort == "+size" || options.Sort == "size")
                 res = items.OrderBy(x => x.Size).ToList();
-            else if (options.Sort == "-Size")
+            else if (options.Sort == "-size")
                 res = items.OrderByDescending(x => x.Size).ToList();
             else res = items;
             
@@ -36,15 +36,20 @@ namespace WebDirStat.Controllers
         }
 
         [HttpPost("extensions")]
-        public IEnumerable<string> ListExtensions([FromBody] StatOptions options)
+        public string ListExtensions([FromBody] StatOptions options)
         {
-            var stat = new DirStatistics(options.Dir);
-            var res = stat.GetExtensions();
-            return res;
+            var res = new List<ExtensionStatItem>();
+            var items = new DirStatistics(options.Dir).GetExtensions();         
+            if (options.Sort == "+freguency" || options.Sort == "freguency")
+                res = items.OrderBy(x => x.Frequency).ToList();
+            else if (options.Sort == "-freguency")
+                res = items.OrderByDescending(x => x.Frequency).ToList();
+            return JsonConvert.SerializeObject(res);
+
         }
 
         [HttpPost("/test/ratings")]
-        public IEnumerable<StatItem> ListAndSortStatItemsTest([FromForm] string name) // todo при передаче текста в теле name = null, c атр. [FromBody] - 415 ошибка
+        public IEnumerable<FileStatItem> ListAndSortStatItemsTest([FromForm] string name) // todo при передаче текста в теле name = null, c атр. [FromBody] - 415 ошибка
         {
             var stat = new DirStatistics(name);
             var res = stat.GetStatItems();

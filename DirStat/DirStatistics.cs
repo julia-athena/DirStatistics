@@ -10,26 +10,42 @@ namespace DirStat
     public class DirStatistics
     {
         private DirectoryInfo DirInfo;
-        private List<StatItem> StatItems;
+        private List<FileStatItem> StatItems;
         private readonly string DbFile = "DirStat.txt";
 
         public DirStatistics(string path)
         {
             DirInfo = new DirectoryInfo(path);
-            StatItems = new List<StatItem>();
+            StatItems = new List<FileStatItem>();
             DbFile = Path.Combine(path, DbFile);
         }
-        public List<StatItem> GetStatItems()
+        public List<FileStatItem> GetStatItems()
         {
             if (StatItems.Count == 0)
-                ReadStatItemsFromFile();
+                GetStatItemsFromFile();
             if (StatItems.Count == 0)
                 FreshStatistics();
             return StatItems;
         }
-        public List<string> GetExtensions()
+        public List<ExtensionStatItem> GetExtensions()
         {
-            throw new NotImplementedException();    
+            if (StatItems.Count == 0)
+                FreshStatistics();
+            var extensionStat = new Dictionary<string, int>();
+            foreach (var item in StatItems)
+            {
+                var curr = Path.GetExtension(item.FullName);
+                if (!extensionStat.ContainsKey(curr))
+                {
+                    extensionStat.Add(curr, 1);
+                }
+                else
+                {
+                    extensionStat[curr]++;
+                }
+            }
+            var res = extensionStat.Select(x => new ExtensionStatItem { Name = x.Key, Frequency = x.Value}).ToList();
+            return res;
         }
         public void FreshStatistics()
         {
@@ -38,12 +54,12 @@ namespace DirStat
             foreach (var fileName in files)
             {
                 var file = new FileInfo(fileName);
-                StatItems.Add(new StatItem(file));
+                StatItems.Add(new FileStatItem(file));
             }
             WriteStatItemsToFile();
         }
 
-        private void ReadStatItemsFromFile()
+        private void GetStatItemsFromFile()
         {
             try
             {
@@ -55,7 +71,7 @@ namespace DirStat
                 {
                     if (line.StartsWith(DirInfo.FullName))
                     {
-                        StatItems.Add(new StatItem(line));
+                        StatItems.Add(new FileStatItem(line));
                     }
                 }
             }
