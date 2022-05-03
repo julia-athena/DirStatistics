@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace DirStat
 {
-    public class FileStatItem: IComparable<FileStatItem>
+    public class FileStatItem: IEquatable<FileStatItem>
     {
         public string FullName;
         public long Size;
@@ -38,11 +38,14 @@ namespace DirStat
             return $"{FullName},{Size},{CreationTime},{RegTime}";
         }
 
-        public int CompareTo(FileStatItem other)
+        public bool Equals(FileStatItem other)
         {
             if (other == null)
-                return -1;
-            return this.RegTime.CompareTo(other.RegTime);
+                return false;
+            return (FullName == other.FullName
+                    && Size == other.Size
+                    && CreationTime.ToString().GetHashCode() == other.CreationTime.ToString().GetHashCode()
+                    && RegTime.ToString().GetHashCode() == other.RegTime.ToString().GetHashCode());
         }
     }
 }

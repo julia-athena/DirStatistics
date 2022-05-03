@@ -82,7 +82,6 @@ namespace DirStat
         }
         private void WriteStatItemsToFile()
         {
-            StatItems.Sort();
             using var writer = new StreamWriter(DbFile, false);
             foreach (var item in StatItems)
             {
@@ -93,17 +92,17 @@ namespace DirStat
         {
             var dir = DirInfo;
             string res = default;
-            while (dir != DirInfo.Root)
+            while (dir.FullName != DirInfo.Root.FullName)
             {
                 try
                 {
                     var files = dir.GetFiles("DirStat.txt");
-                    if (files != null)
+                    if (files != null && files.Any())
                     {
-                        res = files[0].FullName;
+                        res = files[0]?.FullName;
                         break;
                     }
-                    dir = DirInfo.Parent;
+                    dir = dir.Parent;
                 }
                 catch (System.Security.SecurityException e)
                 {
