@@ -7,12 +7,22 @@ using System.Threading.Tasks;
 
 namespace DirStat
 {
-    public static class DirWalker
+    public class DirWalker
     {
-        public static IEnumerable<string> GetFilesRec(string dir)
+        private readonly string _path;
+        public DirWalker(string path)
+        {
+            _path = path;
+        }
+
+        public List<FileStatItem> GetFilesRec()
+        {
+            return GetFilesRec(_path);   
+        }
+        public static List<FileStatItem> GetFilesRec(string dir)
         {
             var stack = new Stack<string>();
-            var dirFiles = new List<string>();  
+            var fileStatItems = new List<FileStatItem>();  
             stack.Push(dir);
             while (stack.Count > 0)
             {
@@ -22,13 +32,20 @@ namespace DirStat
                 {
                     stack.Push(subDir);
                 }
-                var currFiles = GetFiles(currDir);
-                foreach (var currFile in currFiles)
+                var fileNames = GetFiles(currDir);
+                foreach (var fileName in fileNames)
                 {
-                    dirFiles.Add(currFile);
+                    var fileStatItem = GetFileStatItem(fileName);
+                    fileStatItems.Add(fileStatItem);
                 }
             }
-            return dirFiles;    
+            return fileStatItems;    
+        }
+
+        private static FileStatItem GetFileStatItem(string fileName)
+        {
+            var fileInfo = new FileInfo(fileName);
+            return new FileStatItem(fileInfo);
         }
 
         private static string[] GetSubDirs(string dir)

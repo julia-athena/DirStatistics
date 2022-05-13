@@ -59,7 +59,7 @@ namespace WebDirStat.Controllers
         public async Task<string>  MirrorTextFromBody()
         {
             using var reader = new StreamReader(Request.Body); 
-            return await reader.ReadToEndAsync(); //todo почему просто нельзя получить текст из тела?
+            return await reader.ReadToEndAsync(); 
         }  
     }
 }
