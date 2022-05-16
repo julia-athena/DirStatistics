@@ -46,12 +46,20 @@ namespace DirStat
         public List<ExtensionInfo> GetTopExtensions(int n = 0)
         {
             var items = Dao.GetByDirNameRec(_path);
-            var result = new List<ExtensionInfo>();
+            var dictionary = new Dictionary<string, int>();
             foreach (var item in items)
             {
-
+                if(dictionary.ContainsKey(Path.GetExtension(item.FileName)))
+                    dictionary[Path.GetExtension(item.FileName)]++; 
+                else
+                    dictionary.Add(Path.GetExtension(item.FileName), 1);
             }
-            return result;
+            var result = dictionary.OrderBy(x => x.Value)
+                                   .Select(x => new ExtensionInfo { 
+                                       Name = x.Key, 
+                                       Frequency = x.Value})
+                                   .ToList();
+            return result ?? new List<ExtensionInfo>();
         }
     }
 }
