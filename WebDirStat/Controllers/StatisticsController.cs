@@ -17,7 +17,7 @@ namespace WebDirStat.Controllers
         [HttpPost("items")]
         public string ListStatItems([FromBody] StatOptions options)
         {
-            var res = new List<FileStatItem>();
+            var res = new List<StatItem>();
             var items = new DirStatistics(options.Dir).GetStatItems();
             //todo где должна быть логика внизу
             if (options.Sort == "+creationTime" || options.Sort == "creationTime")
@@ -38,7 +38,7 @@ namespace WebDirStat.Controllers
         [HttpPost("extensions")]
         public string ListExtensions([FromBody] StatOptions options)
         {
-            var res = new List<ExtensionStatItem>();
+            var res = new List<ExtensionInfo>();
             var items = new DirStatistics(options.Dir).GetExtensions();         
             if (options.Sort == "+freguency" || options.Sort == "freguency")
                 res = items.OrderBy(x => x.Frequency).ToList();
@@ -49,7 +49,7 @@ namespace WebDirStat.Controllers
         }
 
         [HttpPost("/test/ratings")]
-        public IEnumerable<FileStatItem> ListAndSortStatItemsTest([FromForm] string name) // todo при передаче текста в теле name = null, c атр. [FromBody] - 415 ошибка
+        public IEnumerable<StatItem> ListAndSortStatItemsTest([FromForm] string name) // todo при передаче текста в теле name = null, c атр. [FromBody] - 415 ошибка
         {
             var stat = new DirStatistics(name);
             var res = stat.GetStatItems();

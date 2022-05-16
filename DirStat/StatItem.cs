@@ -7,45 +7,44 @@ using Newtonsoft.Json;
 
 namespace DirStat
 {
-    public class FileStatItem: IEquatable<FileStatItem>
+    public class StatItem: IEquatable<StatItem>
     {
         public string FullName;
+        public string DirName;
+        public string FileName;
         public long Size;
         public DateTime CreationTime;
         public DateTime RegTime = DateTime.Now;
 
-        public FileStatItem()
+        public StatItem()
         {
         }
 
-        public FileStatItem(FileInfo fileInfo)
+        public StatItem(FileInfo fileInfo)
         {
             CreationTime = fileInfo.CreationTime;
             FullName = fileInfo.FullName;
             Size = fileInfo.Length;
-        }
-        public FileStatItem(string input)
-        {
-            var fields = input.Split(',');
-            FullName = fields[0];
-            Size = long.Parse(fields[1]);
-            CreationTime = DateTime.Parse(fields[2]);
-            RegTime = DateTime.Parse(fields[3]);
+            DirName = fileInfo.DirectoryName;
+            FileName = fileInfo.Name;
+
         }
 
         public override string ToString()
         {
-            return $"{FullName},{Size},{CreationTime},{RegTime}";
+            return $"{FileName},{Size},{CreationTime},{RegTime}";
         }
 
-        public bool Equals(FileStatItem other)
+        public bool Equals(StatItem other)
         {
             if (other == null)
                 return false;
-            return (FullName == other.FullName
+            return (FullName.ToString().GetHashCode() == other.FullName.ToString().GetHashCode()
                     && Size == other.Size
                     && CreationTime.ToString().GetHashCode() == other.CreationTime.ToString().GetHashCode()
-                    && RegTime.ToString().GetHashCode() == other.RegTime.ToString().GetHashCode());
+                    && RegTime.ToString().GetHashCode() == other.RegTime.ToString().GetHashCode()
+                    && DirName.GetHashCode() == other.GetHashCode()
+                    && FileName.GetHashCode() == other.FileName.GetHashCode());  
         }
     }
 }

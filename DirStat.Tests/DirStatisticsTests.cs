@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DirStat.Tests
 {
-    public class DirStatTests
+    public class DirStatisticsTests
     {
         private List<string> DirPattern = new() { 
             "TestDirStat\\Dir1",
@@ -18,21 +18,13 @@ namespace DirStat.Tests
         public void GetDirStat()
         {
             GenerateTestData();
-            var statItems = new DirStatistics("TestDirStat").GetStatItems(); 
-            Assert.Equal(statItems.Count, DirPattern.Count);
-            Assert.True(File.Exists("TestDirStat\\DirStat.txt"));
+
         }
 
         [Fact]
         public void GetDirStatFromStatFile()
         {
             GenerateTestData();
-            var parentDir = new DirStatistics("TestDirStat").GetStatItems();
-            var testDir = new DirStatistics(DirPattern[2]).GetStatItems();
-            foreach (var test in testDir)
-            {
-                Assert.Contains(test, parentDir);
-            }
         }
 
         private void GenerateTestData()

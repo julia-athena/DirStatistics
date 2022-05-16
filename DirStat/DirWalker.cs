@@ -7,12 +7,22 @@ using System.Threading.Tasks;
 
 namespace DirStat
 {
-    public static class DirWalker
+    public class DirWalker
     {
-        public static IEnumerable<string> GetFilesRec(string dir)
+        private readonly string _path;   
+        public DirWalker(string path)
+        {
+            _path = path;
+        }
+
+        public List<StatItem> GetFilesRec()
+        {
+            return GetFilesRec(_path);
+        }
+        public static List<StatItem> GetFilesRec(string dir)
         {
             var stack = new Stack<string>();
-            var dirFiles = new List<string>();  
+            var dirFiles = new List<StatItem>();  
             stack.Push(dir);
             while (stack.Count > 0)
             {
@@ -25,7 +35,7 @@ namespace DirStat
                 var currFiles = GetFiles(currDir);
                 foreach (var currFile in currFiles)
                 {
-                    dirFiles.Add(currFile);
+                    dirFiles.Add(new StatItem(new FileInfo(currFile)));
                 }
             }
             return dirFiles;    

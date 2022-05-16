@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace DirStat
 {
-    public class ExtensionStatItem: IEquatable<ExtensionStatItem>
+    public class ExtensionInfo: IEquatable<ExtensionInfo>
     {
         public string Name { get; set; }
         public int Frequency { get; set; }
 
-        public bool Equals(ExtensionStatItem other)
+        public bool Equals(ExtensionInfo other)
         {
             if (other == null)
                 return false;

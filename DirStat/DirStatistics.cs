@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DirStat.Dao;
+using DirStat.Dao.Impl;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,112 +11,47 @@ namespace DirStat
 {
     public class DirStatistics
     {
-        private DirectoryInfo DirInfo;
-        private List<FileStatItem> StatItems;
-        private readonly string DbFile = "DirStat.txt";
+        private IStatItemDao Dao;
+        private DirWalker Walker;
+        private readonly string _path;
 
-        public DirStatistics(string path)
+        public DirStatistics(string path) : this(path, new FileDbStatItemDao())
         {
-            DirInfo = new DirectoryInfo(path);
-            StatItems = new List<FileStatItem>();
-            DbFile = Path.Combine(path, DbFile);
         }
-        public List<FileStatItem> GetStatItems()
+        public DirStatistics(string path, IStatItemDao dao)
         {
-            if (StatItems.Count == 0)
-                GetStatItemsFromFile();
-            if (StatItems.Count == 0)
-                FreshStatistics();
-            return StatItems;
-        }
-        public List<ExtensionStatItem> GetExtensions()
-        {
-            if (StatItems.Count == 0)
-                FreshStatistics();
-            var extensionStat = new Dictionary<string, int>();
-            foreach (var item in StatItems)
-            {
-                var curr = Path.GetExtension(item.FullName);
-                if (!extensionStat.ContainsKey(curr))
-                {
-                    extensionStat.Add(curr, 1);
-                }
-                else
-                {
-                    extensionStat[curr]++;
-                }
-            }
-            var res = extensionStat.Select(x => new ExtensionStatItem { Name = x.Key, Frequency = x.Value}).ToList();
-            return res;
-        }
-        public void FreshStatistics()
-        {
-            StatItems.Clear();  
-            var files = GetFiles();
-            foreach (var fileName in files)
-            {
-                var file = new FileInfo(fileName);
-                StatItems.Add(new FileStatItem(file));
-            }
-            WriteStatItemsToFile();
+            _path = path;
+            Dao = dao;
+            Walker = new DirWalker(path);
         }
 
-        private void GetStatItemsFromFile()
+        public void FreshStatItemsInfo()
         {
-            try
-            {
-                var dbFile = FindDbFileOrNull();
-                if (dbFile == null) return;
-                using var reader = new StreamReader(dbFile);
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.StartsWith(DirInfo.FullName))
-                    {
-                        StatItems.Add(new FileStatItem(line));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error reading DbFile: {e.Message}");
-            }
-        }
-        private void WriteStatItemsToFile()
-        {
-            using var writer = new StreamWriter(DbFile, false);
-            foreach (var item in StatItems)
-            {
-                writer.WriteLine(item.ToString());
-            }
-        }
-        private string FindDbFileOrNull()
-        {
-            var dir = DirInfo;
-            string res = default;
-            while (dir.FullName != DirInfo.Root.FullName)
-            {
-                try
-                {
-                    var files = dir.GetFiles("DirStat.txt");
-                    if (files != null && files.Any())
-                    {
-                        res = files[0]?.FullName;
-                        break;
-                    }
-                    dir = dir.Parent;
-                }
-                catch (System.Security.SecurityException e)
-                {
-                    Console.WriteLine($"Error: {e.Message}");
-                }
-            }
-            return res;
+            var items = Walker.GetFilesRec();
+            Dao.AddOrUpdateAll(items);
         }
 
-        private IEnumerable<string> GetFiles()
+        public List<StatItem> GetTopBigFiles(int n = 0)
         {
-            return DirWalker.GetFilesRec(DirInfo.FullName);
+            var items = Dao.GetByDirNameRec(_path);
+            var result = items.OrderByDescending(x => x.Size).ToList();
+            return result;      
+        }
+        public List<StatItem> GetTopOldFiles(int n = 0)
+        {
+            var items = Dao.GetByDirNameRec(_path);
+            var result = items.OrderBy(x => x.CreationTime).ToList();
+            return result;
+        }
+        public List<ExtensionInfo> GetTopExtensions(int n = 0)
+        {
+            var items = Dao.GetByDirNameRec(_path);
+            var result = new List<ExtensionInfo>();
+            foreach (var item in items)
+            {
+
+            }
+            return result;
         }
     }
 }
