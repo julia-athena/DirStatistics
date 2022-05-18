@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiteDB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,27 +9,53 @@ namespace DirStat.Dao.Impl
 {
     public class LiteDbStatItemDao : IStatItemDao
     {
-        public List<StatItem> GetAll()
+        private readonly string _filepath;
+        public LiteDbStatItemDao(string filepath)
         {
-            throw new NotImplementedException();
+            _filepath = filepath;
+        }
+        public LiteDbStatItemDao() : this("StatItem.db")
+        {
+        }
+
+        public List<StatItem> GetAll() // какой тип возвращать в сигнатуре?
+        {
+            using(var db = new LiteDatabase(_filepath)) // открывает или создает бд
+            {
+                var collection = db.GetCollection<StatItem>("StatItems");  //получить коллекцию или создать 
+                var result = collection.FindAll().ToList();
+                return result; // какой тип передовать по факту?
+            }
         }
 
         public List<StatItem> GetByDirName(string dirName)
         {
-            throw new NotImplementedException();
+            using (var db = new LiteDatabase(_filepath)) // открывает или создает бд
+            {
+                var collection = db.GetCollection<StatItem>("StatItems");  //получить коллекцию или создать 
+                collection.EnsureIndex(x => x.DirName); // создает индекс если его еще нет
+                var result = collection.Find(x => x.DirName == dirName).ToList();
+                return result;
+            }
         }
 
         public List<StatItem> GetByDirNameRec(string dirName)
         {
-            throw new NotImplementedException();
+            using (var db = new LiteDatabase(_filepath)) // открывает или создает бд
+            {
+                var collection = db.GetCollection<StatItem>("StatItems");  //получить коллекцию или создать 
+                collection.EnsureIndex(x => x.DirName); // создает индекс если его еще нет
+                var result = collection.Find(x => x.DirName.StartsWith(dirName)).ToList();
+                return result;
+            }
         }
-        public void AddAll(List<StatItem> data)
+        public void AddOrUpdateAll(List<StatItem> data) // что возвращать при модификации данных? bool? какие данные лучше принимать
         {
-            throw new NotImplementedException();
-        }
-        public void AddOrUpdateAll(List<StatItem> data)
-        {
-            throw new NotImplementedException();
+            using (var db = new LiteDatabase(_filepath)) // открывает или создает бд
+            {
+                var collection = db.GetCollection<StatItem>("StatItems");  //получить коллекцию или создать 
+                collection.Upsert(data); //делает вставку или обновление по полю с атрибутом BsonId
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ namespace DirStat.Dao.Impl
             _filepath = filepath;
 
         }
-        public FileDbStatItemDao() : this("DirStat.txt")
+        public FileDbStatItemDao() : this("StatItem.txt")
         {
         }
 
@@ -70,27 +70,7 @@ namespace DirStat.Dao.Impl
             return res;
         }
 
-        public void AddAll(List<StatItem> data) //что лучше принимать в качестве параметра интерфейс, объект ?
-        {
-            if (_content == null) LoadDbContent();
-            var result = new List<StatItem>();
-            var dirs = data.Select(x => x.DirName).Distinct();
-            using (var sw = new StreamWriter(_filepath))
-            {
-                foreach (var dir in dirs)
-                {
-                    sw.WriteLine($"?{dir}");
-                    var dirItems = data.Where(x => x.DirName == dir).ToList();
-                    foreach (var item in dirItems)
-                    {
-                        sw.WriteLine(item.ToString());
-                    }
-                }
-            }
-        }
-
-
-        public void AddOrUpdateAll(List<StatItem> data)
+        public void AddOrUpdateAll(List<StatItem> data) //что лучше принимать в качестве параметра интерфейс, объект ? что возвращать?
         {
             if (_content == null) LoadDbContent();
             var result = new List<StatItem>();
@@ -113,6 +93,27 @@ namespace DirStat.Dao.Impl
             }
 
         }
+
+        private void AddAll(List<StatItem> data) 
+        {
+            if (_content == null) LoadDbContent();
+            var result = new List<StatItem>();
+            var dirs = data.Select(x => x.DirName).Distinct();
+            using (var sw = new StreamWriter(_filepath))
+            {
+                foreach (var dir in dirs)
+                {
+                    sw.WriteLine($"?{dir}");
+                    var dirItems = data.Where(x => x.DirName == dir).ToList();
+                    foreach (var item in dirItems)
+                    {
+                        sw.WriteLine(item.ToString());
+                    }
+                }
+            }
+        }
+
+
 
         private void DeleteByDirName(string dirName)
         {

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LiteDB;
 using Newtonsoft.Json;
 
 namespace DirStat
 {
     public class StatItem: IEquatable<StatItem>
     {
+        [BsonId]
         public string FullName;
         public string DirName;
         public string FileName;

@@ -17,49 +17,14 @@ namespace WebDirStat.Controllers
         [HttpPost("items")]
         public string ListStatItems([FromBody] StatOptions options)
         {
-            var res = new List<StatItem>();
-            var items = new DirStatistics(options.Dir).GetStatItems();
-            //todo где должна быть логика внизу
-            if (options.Sort == "+creationTime" || options.Sort == "creationTime")
-                res = items.OrderBy(x => x.CreationTime).ToList();
-            else if (options.Sort == "-creationTime")
-                res = items.OrderByDescending(x => x.CreationTime).ToList();
-            else if (options.Sort == "+size" || options.Sort == "size")
-                res = items.OrderBy(x => x.Size).ToList();
-            else if (options.Sort == "-size")
-                res = items.OrderByDescending(x => x.Size).ToList();
-            else res = items;
-            
-            var top = options.Top <= 0 ? items.Count : options.Top;            
-            res = res.GetRange(0, Math.Min(top, items.Count));
-            return JsonConvert.SerializeObject(res); 
+            return "";
         }
 
         [HttpPost("extensions")]
         public string ListExtensions([FromBody] StatOptions options)
         {
-            var res = new List<ExtensionInfo>();
-            var items = new DirStatistics(options.Dir).GetExtensions();         
-            if (options.Sort == "+freguency" || options.Sort == "freguency")
-                res = items.OrderBy(x => x.Frequency).ToList();
-            else if (options.Sort == "-freguency")
-                res = items.OrderByDescending(x => x.Frequency).ToList();
-            return JsonConvert.SerializeObject(res);
-
+            return "";
         }
 
-        [HttpPost("/test/ratings")]
-        public IEnumerable<StatItem> ListAndSortStatItemsTest([FromForm] string name) // todo при передаче текста в теле name = null, c атр. [FromBody] - 415 ошибка
-        {
-            var stat = new DirStatistics(name);
-            var res = stat.GetStatItems();
-            return res;
-        }
-        [HttpPost("/test/mirror")]
-        public async Task<string>  MirrorTextFromBody()
-        {
-            using var reader = new StreamReader(Request.Body); 
-            return await reader.ReadToEndAsync(); //todo почему просто нельзя получить текст из тела?
-        }  
     }
 }

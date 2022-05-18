@@ -31,19 +31,24 @@ namespace DirStat
             Dao.AddOrUpdateAll(items);
         }
 
-        public List<StatItem> GetTopBigFiles(int n = 0)
+        public List<StatItem> GetTopBigFiles(int n)
         {
             var items = Dao.GetByDirNameRec(_path);
-            var result = items.OrderByDescending(x => x.Size).ToList();
+            var result = items.OrderByDescending(x => x.Size)
+                              .Take(n)
+                              .ToList();
+
             return result;      
         }
-        public List<StatItem> GetTopOldFiles(int n = 0)
+        public List<StatItem> GetTopOldFiles(int n)
         {
             var items = Dao.GetByDirNameRec(_path);
-            var result = items.OrderBy(x => x.CreationTime).ToList();
+            var result = items.OrderBy(x => x.CreationTime)
+                              .Take(n)
+                              .ToList();
             return result;
         }
-        public List<ExtensionInfo> GetTopExtensions(int n = 0)
+        public List<ExtensionInfo> GetTopExtensions(int n)
         {
             var items = Dao.GetByDirNameRec(_path);
             var dictionary = new Dictionary<string, int>();
@@ -58,8 +63,9 @@ namespace DirStat
                                    .Select(x => new ExtensionInfo { 
                                        Name = x.Key, 
                                        Frequency = x.Value})
+                                   .Take(n)
                                    .ToList();
-            return result ?? new List<ExtensionInfo>();
+            return result;
         }
     }
 }
