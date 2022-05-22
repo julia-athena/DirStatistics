@@ -44,7 +44,7 @@ namespace DirStat
                     && Size == other.Size
                     && CreationTime.ToString().GetHashCode() == other.CreationTime.ToString().GetHashCode()
                     && RegTime.ToString().GetHashCode() == other.RegTime.ToString().GetHashCode()
-                    && DirName.GetHashCode() == other.GetHashCode()
+                    && DirName.GetHashCode() == other.DirName.GetHashCode()
                     && FileName.GetHashCode() == other.FileName.GetHashCode());  
         }
     }

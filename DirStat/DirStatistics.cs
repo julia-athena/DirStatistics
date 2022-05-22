@@ -44,7 +44,7 @@ namespace DirStat
             var items = Dao.GetByDirNameRec(_path);
             var result = items.OrderBy(x => x.CreationTime)
                               .ToList();
-            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default(int));
+            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default);
             return result.Take(count);
         }
         public IEnumerable<ExtensionInfo> GetTopExtensions(int? n)
@@ -58,12 +58,12 @@ namespace DirStat
                 else
                     dictionary.Add(Path.GetExtension(item.FileName), 1);
             }
-            var result = dictionary.OrderBy(x => x.Value)
+            var result = dictionary.OrderByDescending(x => x.Value)
                                    .Select(x => new ExtensionInfo { 
                                        Name = x.Key, 
                                        Frequency = x.Value})
                                    .ToList();
-            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default(int));
+            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default);
             return result.Take(count);
         }
     }
