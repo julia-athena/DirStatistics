@@ -1,0 +1,6 @@
+?C:\Users\yvgva\source\repos\DirStat\DirStat.Tests\bin\Debug\net6.0\TestDirStat\Dir1
+Test1.txt,512,03.05.2022 13:06:15,22.05.2022 14:25:34
+?C:\Users\yvgva\source\repos\DirStat\DirStat.Tests\bin\Debug\net6.0\TestDirStat\Dir2
+Test2.txt,1024,03.05.2022 13:06:15,22.05.2022 14:26:02
+?C:\Users\yvgva\source\repos\DirStat\DirStat.Tests\bin\Debug\net6.0\TestDirStat\Dir2\Dir2_1
+Test3.txt,1536,03.05.2022 13:06:15,22.05.2022 14:26:02

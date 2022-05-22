@@ -4,18 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using LiteDB;
-using Newtonsoft.Json;
 
 namespace DirStat
 {
     public class StatItem: IEquatable<StatItem>
     {
-        [BsonId]
-        public string FullName;
-        public string DirName;
-        public string FileName;
-        public long Size;
-        public DateTime CreationTime;
+        //[BsonId]
+        public string FullName { get; set; }
+        public string DirName { get; set; }
+        public string FileName { get; set; }
+        public long Size { get; set; }
+        public DateTime CreationTime { get; set; }
         public DateTime RegTime = DateTime.Now;
 
         public StatItem()

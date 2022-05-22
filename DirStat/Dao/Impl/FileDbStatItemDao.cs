@@ -9,70 +9,72 @@ namespace DirStat.Dao.Impl
 {
     public class FileDbStatItemDao : IStatItemDao // классы dao создаются по каждой сущности и по каждой бд? как описывать связи?
     {
-        private readonly string _filepath;
-        private string _content;
+        private readonly string _filePath;
+        private FileInfo _fileDb;
 
-        public FileDbStatItemDao(string filepath)
+        public FileDbStatItemDao(string filePath)
         {
-            _filepath = filepath;
-
+            _filePath = Path.GetFullPath(filePath);
+            _fileDb = new FileInfo(_filePath);
+            InitFileDb();
         }
-        public FileDbStatItemDao() : this("StatItem.txt")
+        public FileDbStatItemDao() : this("FileDbStatItem.txt")
         {
         }
 
-        public void LoadDbContent()
+        private void InitFileDb()
         {
-            _content = File.ReadAllText(_filepath);
+            if (!_fileDb.Exists)
+                _fileDb.Create().Close();
         }
 
         public List<StatItem> GetAll() //что лучше "возвращать" в сигнатуре интерфейс или обьект?
         {
-            if (_content == null) LoadDbContent();
-            var res = new List<StatItem>(); 
-            var blocks = _content.Split('?', StringSplitOptions.RemoveEmptyEntries);
+            var content = File.ReadAllText(_filePath);//наверное неоптимально каждый раз читать содержание файла и загружать все содержание файла, если он большой
+            var result = new List<StatItem>(); 
+            var blocks = content.Split('?', StringSplitOptions.RemoveEmptyEntries); // есть более быстрые варианты обработки файла
             foreach (var block in blocks)
             {
                 var items = ParseBlock(block);
-                res.AddRange(items);
+                result.AddRange(items);
             }
-            return res; //что лучше "возвращать" по факту?
+            return result; //что возвращать по факту 
         }
 
         public List<StatItem> GetByDirName(string dirName)
         {
-            if (_content == null) LoadDbContent();
-            var res = new List<StatItem>();
-            var blocks = _content.Split('?', StringSplitOptions.RemoveEmptyEntries);
+            var content = File.ReadAllText(_filePath);
+            var result = new List<StatItem>();
+            var blocks = content.Split('?', StringSplitOptions.RemoveEmptyEntries);
             foreach (var block in blocks)
             {
-                if (block == dirName)
+                if (dirName == ParseBlockName(block))
                 {
                     var items = ParseBlock(block);
-                    res.AddRange(items);
+                    result.AddRange(items);
                 }
             }
-            return res;
+            return result;
         }
         public List<StatItem> GetByDirNameRec(string dirName) 
         {
-            if (_content == null) LoadDbContent();
-            var res = new List<StatItem>();
-            var blocks = _content.Split('?', StringSplitOptions.RemoveEmptyEntries);
+            var content = File.ReadAllText(_filePath);
+            var result = new List<StatItem>();
+            var blocks = content.Split('?', StringSplitOptions.RemoveEmptyEntries);
             foreach (var block in blocks)
             {
                 if (block.Contains(dirName))
                 {
                     var items = ParseBlock(block);
-                    res.AddRange(items);
+                    result.AddRange(items);
                 }
             }
-            return res;
+            return result;
         }
 
-        public void AddOrUpdateAll(List<StatItem> data) //что лучше принимать в качестве параметра интерфейс, объект ? что возвращать?
+        public void AddOrUpdateAll(List<StatItem> data)
         {
-            if (_content == null) LoadDbContent();
+            var content = File.ReadAllText(_filePath);
             var result = new List<StatItem>();
             var dirs = data.Select(x => x.DirName).Distinct();
             foreach (var dir in dirs)
@@ -81,7 +83,7 @@ namespace DirStat.Dao.Impl
                 var currFiles = GetByDirName(dir);
                 if (currFiles.Count() > 0)
                 {
-                    result = currFiles.Except(inputFiles).ToList();
+                    result = currFiles.ExceptBy(inputFiles.Select(x => x.FullName), x => x.FullName).ToList();
                     result.AddRange(inputFiles);
                     DeleteByDirName(dir);
                     AddAll(result);
@@ -96,15 +98,15 @@ namespace DirStat.Dao.Impl
 
         private void AddAll(List<StatItem> data) 
         {
-            if (_content == null) LoadDbContent();
+            var content = File.ReadAllText(_filePath);
             var result = new List<StatItem>();
             var dirs = data.Select(x => x.DirName).Distinct();
-            using (var sw = new StreamWriter(_filepath))
+            using (var sw = new StreamWriter(_filePath, true))
             {
                 foreach (var dir in dirs)
                 {
                     sw.WriteLine($"?{dir}");
-                    var dirItems = data.Where(x => x.DirName == dir).ToList();
+                    var dirItems = data.Where(x => x.DirName == dir);
                     foreach (var item in dirItems)
                     {
                         sw.WriteLine(item.ToString());
@@ -113,21 +115,25 @@ namespace DirStat.Dao.Impl
             }
         }
 
-
-
         private void DeleteByDirName(string dirName)
         {
-            var startIndex = _content.IndexOf(dirName);
-            var endIndex = _content.IndexOf("?", startIndex)-1;  
-            var count = endIndex - startIndex;  
-            var tempContent = _content.Remove(startIndex,count);
-            using (var sw = new StreamWriter(_filepath))
+            var content = File.ReadAllText(_filePath);
+            var startIndex = content.IndexOf("?" + dirName+"\r\n");
+            var endIndex = content.IndexOf("?", startIndex+1);
+            if (endIndex == -1) endIndex = content.Length;
+            var count = endIndex - startIndex;
+            var tempContent = content.Remove(startIndex, count);
+            using (var sw = new StreamWriter(_filePath))
             {
                 sw.Write(tempContent);
             }
-            _content = tempContent; 
         }
 
+        private string ParseBlockName(string block)
+        {
+            var blockLines = block.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+            return blockLines[0];
+        }
 
         private List<StatItem> ParseBlock(string block)
         {

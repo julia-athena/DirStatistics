@@ -12,7 +12,7 @@ namespace DirStat
         private readonly string _path;   
         public DirWalker(string path)
         {
-            _path = path;
+            _path = path ?? throw new ArgumentNullException();
         }
 
         public List<StatItem> GetFilesRec()

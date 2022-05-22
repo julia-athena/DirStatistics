@@ -1,5 +1,6 @@
 ﻿using DirStat.Dao;
 using DirStat.Dao.Impl;
+using DirStat.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,41 +15,39 @@ namespace DirStat
         private IStatItemDao Dao;
         private DirWalker Walker;
         private readonly string _path;
-
         public DirStatistics(string path) : this(path, new FileDbStatItemDao())
         {
         }
         public DirStatistics(string path, IStatItemDao dao)
         {
-            _path = path;
-            Dao = dao;
+            _path = path ?? throw new ArgumentNullException();
+            Dao = dao ?? throw new ArgumentNullException();
             Walker = new DirWalker(path);
         }
 
-        public void FreshStatItemsInfo()
+        public void FreshDataForStatistics()
         {
-            var items = Walker.GetFilesRec();
-            Dao.AddOrUpdateAll(items);
+            var files = Walker.GetFilesRec();
+            Dao.AddOrUpdateAll(files);
         }
 
-        public List<StatItem> GetTopBigFiles(int n)
+        public IEnumerable<StatItem> GetTopBigFiles(int? n) 
         {
             var items = Dao.GetByDirNameRec(_path);
             var result = items.OrderByDescending(x => x.Size)
-                              .Take(n)
                               .ToList();
-
-            return result;      
+            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default); 
+            return result.Take(count);      
         }
-        public List<StatItem> GetTopOldFiles(int n)
+        public IEnumerable<StatItem> GetTopOldFiles(int? n)
         {
             var items = Dao.GetByDirNameRec(_path);
             var result = items.OrderBy(x => x.CreationTime)
-                              .Take(n)
                               .ToList();
-            return result;
+            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default(int));
+            return result.Take(count);
         }
-        public List<ExtensionInfo> GetTopExtensions(int n)
+        public IEnumerable<ExtensionInfo> GetTopExtensions(int? n)
         {
             var items = Dao.GetByDirNameRec(_path);
             var dictionary = new Dictionary<string, int>();
@@ -63,9 +62,9 @@ namespace DirStat
                                    .Select(x => new ExtensionInfo { 
                                        Name = x.Key, 
                                        Frequency = x.Value})
-                                   .Take(n)
                                    .ToList();
-            return result;
+            var count = Math.Min(result.Count, n is null ? result.Count : n ?? default(int));
+            return result.Take(count);
         }
     }
 }

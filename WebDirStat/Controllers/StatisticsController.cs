@@ -14,16 +14,30 @@ namespace WebDirStat.Controllers
     [Route("api/[controller]")]
     public class StatisticsController : ControllerBase 
     {
-        [HttpPost("items")]
-        public string ListStatItems([FromBody] StatOptions options)
+        [HttpPost("files/old")]
+        public IEnumerable<StatItem> GetOldFiles(StatOptions options) // какой тип возвращать
         {
-            return "";
+            var dirStat = new DirStatistics(options.DirectoryName);
+            dirStat.FreshDataForStatistics();
+            var files = dirStat.GetTopOldFiles(options.Limit);
+            return files;
+        }
+        [HttpPost("files/big")]
+        public IEnumerable<StatItem> GetBigFiles(StatOptions options)
+        {
+            var dirStat = new DirStatistics(options.DirectoryName);
+            dirStat.FreshDataForStatistics();
+            var files = dirStat.GetTopBigFiles(options.Limit);
+            return files;
         }
 
-        [HttpPost("extensions")]
-        public string ListExtensions([FromBody] StatOptions options)
+        [HttpPost("extensions/info")]
+        public IEnumerable<ExtensionInfo> GetExtensions(ExtensionInfoOptions options) 
         {
-            return "";
+            var dirStat = new DirStatistics(options.DirectoryName);
+            dirStat.FreshDataForStatistics();
+            var extensions = dirStat.GetTopExtensions(options.Limit);
+            return extensions;
         }
 
     }
