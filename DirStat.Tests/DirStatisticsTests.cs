@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System;
 using Moq;
 using System.Text;
-using DirStat.Dao;
-using DirStat.Dao.Impl;
+using DirStat.Dao.Implementation.FileDb;
 using System.Linq;
+using DirStat.Service.Dao;
 
-namespace DirStat.Tests
+namespace DirStat.Service.Tests
 {
     public class DirStatisticsTests
     {
@@ -20,7 +20,7 @@ namespace DirStat.Tests
             var expected = GetTopBigFiles_GetExpected();
             var daoMock = new Mock<IStatItemDao>();
             daoMock.Setup(d => d.GetByDirNameRec("TestDir")).Returns(GetTestData());
-            var dirStat = new DirStatistics("TestDir", daoMock.Object);
+            var dirStat = new DirStatisticsServer("TestDir", daoMock.Object);
             // Act
             var actual = dirStat.GetTopBigFiles(3);
             // Assert
@@ -34,7 +34,7 @@ namespace DirStat.Tests
             var expected = GetTopOldFiles_GetExpected();
             var daoMock = new Mock<IStatItemDao>();
             daoMock.Setup(d => d.GetByDirNameRec("TestDir")).Returns(GetTestData());
-            var dirStat = new DirStatistics("TestDir", daoMock.Object);
+            var dirStat = new DirStatisticsServer("TestDir", daoMock.Object);
             // Act
             var actual = dirStat.GetTopOldFiles(3);
             // Assert
@@ -47,7 +47,7 @@ namespace DirStat.Tests
             var expected = GetTopExtensions_GetExpected();
             var daoMock = new Mock<IStatItemDao>();
             daoMock.Setup(d => d.GetByDirNameRec("TestDir")).Returns(GetTestData());
-            var dirStat = new DirStatistics("TestDir", daoMock.Object);
+            var dirStat = new DirStatisticsServer("TestDir", daoMock.Object);
             // Act
             var actual = dirStat.GetTopExtensions(3);
             // Assert

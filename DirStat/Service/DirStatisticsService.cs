@@ -1,24 +1,24 @@
-﻿using DirStat.Dao;
-using DirStat.Dao.Impl;
-using DirStat.Extensions;
+﻿using DirStat.Service.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DirStat.Service.Dao;
+using DirStat.Dao.Implementation.FileDb;
 
 
-namespace DirStat
+namespace DirStat.Service
 {
-    public class DirStatistics
+    public class DirStatisticsServer
     {
         private IStatItemDao Dao;
         private DirWalker Walker;
         private readonly string _path;
-        public DirStatistics(string path) : this(path, new FileDbStatItemDao())
+        public DirStatisticsServer(string path) : this(path, new FileDbStatItemDao())
         {
         }
-        public DirStatistics(string path, IStatItemDao dao)
+        public DirStatisticsServer(string path, IStatItemDao dao)
         {
             _path = path ?? throw new ArgumentNullException();
             Dao = dao ?? throw new ArgumentNullException();

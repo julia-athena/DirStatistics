@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirStat.Service;
+using DirStat.Service.Dao;
 
-namespace DirStat.Dao.Impl
+namespace DirStat.Dao.Implementation.FileDb
 {
-    public class FileDbStatItemDao : IStatItemDao // классы dao создаются по каждой сущности и по каждой бд? как описывать связи?
+    public class FileDbStatItemDao : IStatItemDao 
     {
         private readonly string _filePath;
         private FileInfo _fileDb;
@@ -28,20 +30,20 @@ namespace DirStat.Dao.Impl
                 _fileDb.Create().Close();
         }
 
-        public List<StatItem> GetAll() //что лучше "возвращать" в сигнатуре интерфейс или обьект?
+        public IList<StatItem> GetAll() 
         {
-            var content = File.ReadAllText(_filePath);//наверное неоптимально каждый раз читать содержание файла и загружать все содержание файла, если он большой
+            var content = File.ReadAllText(_filePath);
             var result = new List<StatItem>(); 
-            var blocks = content.Split('?', StringSplitOptions.RemoveEmptyEntries); // есть более быстрые варианты обработки файла
+            var blocks = content.Split('?', StringSplitOptions.RemoveEmptyEntries);
             foreach (var block in blocks)
             {
                 var items = ParseBlock(block);
                 result.AddRange(items);
             }
-            return result; //что возвращать по факту 
+            return result;  
         }
 
-        public List<StatItem> GetByDirName(string dirName)
+        public IList<StatItem> GetByDirName(string dirName)
         {
             var content = File.ReadAllText(_filePath);
             var result = new List<StatItem>();
@@ -56,7 +58,7 @@ namespace DirStat.Dao.Impl
             }
             return result;
         }
-        public List<StatItem> GetByDirNameRec(string dirName) 
+        public IList<StatItem> GetByDirNameRec(string dirName) 
         {
             var content = File.ReadAllText(_filePath);
             var result = new List<StatItem>();

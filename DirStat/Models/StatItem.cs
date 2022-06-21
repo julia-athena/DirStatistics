@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using LiteDB;
 
-namespace DirStat
+namespace DirStat.Service
 {
     public class StatItem: IEquatable<StatItem>
     {

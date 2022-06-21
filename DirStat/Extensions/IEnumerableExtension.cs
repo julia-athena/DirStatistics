@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DirStat.Extensions
+namespace DirStat.Service.Extensions
 {
     public static class IEnumerableExtension
     {
