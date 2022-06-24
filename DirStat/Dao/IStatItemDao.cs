@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirStat.Models;
 
-namespace DirStat.Service.Dao
+namespace DirStat.Dao
 {
     public interface IStatItemDao
     {

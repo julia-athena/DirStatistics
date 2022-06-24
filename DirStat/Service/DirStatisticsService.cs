@@ -1,11 +1,11 @@
-﻿using DirStat.Service.Extensions;
+﻿using DirStat.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DirStat.Service.Dao;
 using DirStat.Dao.Implementation.FileDb;
+using DirStat.Dao;
+using DirStat.Providers;
 
 
 namespace DirStat.Service
@@ -13,7 +13,7 @@ namespace DirStat.Service
     public class DirStatisticsServer
     {
         private IStatItemDao Dao;
-        private DirWalker Walker;
+        private DirWalkerProvider _walkerProvider;
         private readonly string _path;
         public DirStatisticsServer(string path) : this(path, new FileDbStatItemDao())
         {
@@ -22,12 +22,12 @@ namespace DirStat.Service
         {
             _path = path ?? throw new ArgumentNullException();
             Dao = dao ?? throw new ArgumentNullException();
-            Walker = new DirWalker(path);
+            _walkerProvider = new DirWalkerProvider(path);
         }
 
         public void FreshDataForStatistics()
         {
-            var files = Walker.GetFilesRec();
+            var files = _walkerProvider.GetFilesRec();
             Dao.AddOrUpdateAll(files);
         }
 

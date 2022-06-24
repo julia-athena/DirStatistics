@@ -4,15 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirStat.Models;
 
-namespace DirStat.Service
+namespace DirStat.Providers
 {
-    public class DirWalker
+    public class DirWalkerProvider
     {
         private readonly string _path;   
-        public DirWalker(string path)
+        public DirWalkerProvider(string path)
         {
-            _path = path ?? throw new ArgumentNullException();
+            _path = path ?? throw new ArgumentNullException(nameof(path));
         }
 
         public List<StatItem> GetFilesRec()
@@ -33,10 +34,8 @@ namespace DirStat.Service
                     stack.Push(subDir);
                 }
                 var currFiles = GetFiles(currDir);
-                foreach (var currFile in currFiles)
-                {
-                    dirFiles.Add(new StatItem(new FileInfo(currFile)));
-                }
+                var statItems = currFiles.Select(x => new StatItem(new FileInfo(x)));
+                dirFiles.AddRange(statItems);
             }
             return dirFiles;    
         }

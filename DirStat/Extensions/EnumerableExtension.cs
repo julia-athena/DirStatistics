@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DirStat.Service.Extensions
+namespace DirStat.Extensions
 {
-    public static class IEnumerableExtension
+    public static class EnumerableExtension
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
         {

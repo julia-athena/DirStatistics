@@ -3,12 +3,12 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 using Moq;
-using System.Text;
-using DirStat.Dao.Implementation.FileDb;
 using System.Linq;
-using DirStat.Service.Dao;
+using DirStat.Dao;
+using DirStat.Models;
+using DirStat.Service;
 
-namespace DirStat.Service.Tests
+namespace DirStat.Tests
 {
     public class DirStatisticsTests
     {

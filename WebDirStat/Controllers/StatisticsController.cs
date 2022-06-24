@@ -1,12 +1,9 @@
-﻿using DirStat.Service;
+﻿using System;
+using DirStat.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using DirStat.Service;
 using WebDirStat.Models;
-using Newtonsoft.Json;
 
 namespace WebDirStat.Controllers
 {

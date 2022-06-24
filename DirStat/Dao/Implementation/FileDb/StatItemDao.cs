@@ -4,8 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DirStat.Service;
-using DirStat.Service.Dao;
+using DirStat.Models;
 
 namespace DirStat.Dao.Implementation.FileDb
 {

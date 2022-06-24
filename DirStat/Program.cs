@@ -1,4 +1,4 @@
-﻿using DirStat.Service;
+﻿using DirStat.Models;
 using ConsoleTables;
 using System;
 using System.Collections.Generic;

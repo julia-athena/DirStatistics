@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DirStat.Service
+namespace DirStat.Models
 {
     public class ExtensionInfo: IEquatable<ExtensionInfo>
     {

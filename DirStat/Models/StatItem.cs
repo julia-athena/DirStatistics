@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using LiteDB;
 
-namespace DirStat.Service
+namespace DirStat.Models
 {
     public class StatItem: IEquatable<StatItem>
     {
-        //[BsonId]
+        [BsonId]
         public string FullName { get; set; }
         public string DirName { get; set; }
         public string FileName { get; set; }
